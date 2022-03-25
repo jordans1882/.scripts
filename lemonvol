@@ -1,0 +1,14 @@
+#!/bin/sh
+
+vol=$(pamixer --get-volume)
+mute=$(pamixer --get-volume-human)
+
+    icon=$(echo "奔")
+
+if [ "$mute" = "muted" ]; then
+    label=$(printf "mute \n")
+else
+    label=$vol%
+fi
+
+printf "%s\n" "V奔 $vol"

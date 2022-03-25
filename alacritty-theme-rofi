@@ -1,0 +1,10 @@
+#!/usr/bin/bash
+
+alacritty_theme_dir="$HOME/git_repos/base16-alacritty/colors/"
+dir_len=$(echo "$alacritty_theme_dir" | wc -c)
+themes=$(find $alacritty_theme_dir -type f | cut -c $dir_len-)
+selected_theme=$(echo "$themes" | rofi -dmenu -i)
+printf "\n \n"
+if [ -n "$selected_theme" ]; then
+    alacritty-theme --tname $selected_theme
+fi

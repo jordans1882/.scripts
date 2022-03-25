@@ -1,0 +1,11 @@
+#!/usr/bin/bash
+
+qutebrowser_theme_dir="~/git_repos/base16-qutebrowser/themes/default/"
+dir_len=$(echo "$qutebrowser_theme_dir" | wc -c)
+themes=$(find $qutebrowser_theme_dir -type f | grep light | cut -c $dir_len-)
+selected_theme=$(echo "$themes" | rofi -dmenu -i)
+printf "\n \n"
+if [ -n "$selected_theme" ]; then
+    qutebrowser-theme --tname $selected_theme --dmode False
+fi
+

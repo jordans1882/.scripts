@@ -1,0 +1,4 @@
+#!/bin/bash
+
+kitty @ set-colors -a "~/.config/kitty/kitty-themes/themes/Spring.conf"
+

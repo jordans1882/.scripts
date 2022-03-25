@@ -1,0 +1,8 @@
+#!/bin/sh
+
+pkill lemonbar
+sleep 0.1
+pkill panel-top
+sleep 0.1
+
+panel-top

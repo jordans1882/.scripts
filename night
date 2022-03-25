@@ -1,0 +1,7 @@
+#!/bin/bash
+
+COLOR_DIR="$HOME/.config/alacritty/colors"
+LIGHT_COLOR='base16-gruvbox-light-soft.yml'
+DARK_COLOR='base16-equilibrium-gray-dark-256.yml'
+
+alacritty-theme --tname $DARK_COLOR

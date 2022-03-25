@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+book_parent_dir="$HOME/media/usb/books/"
+parent_dir_char_length=$(echo "$book_parent_dir" | wc -c)
+books=$(find ${book_parent_dir} -type f | cut -c $parent_dir_char_length-)
+selected_book=$(echo "$books" | rofi -dmenu -i)
+printf "\n \n"
+if [ -n "$selected_book" ]; then
+  zathura "$book_parent_dir$selected_book"
+fi

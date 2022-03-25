@@ -1,0 +1,4 @@
+#!/bin/sh
+
+killall lemonbar
+killall panel-top

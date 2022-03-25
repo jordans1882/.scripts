@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+# scripts_dir="$HOME/.scripts/"
+# opacity_scriptname="alacritty_opacity.sh"
+# source $scripts_dir$opacity_scriptname
+# echo $opacity
+# incremented_opacity=$(($opacity + 5))
+# echo $incremented_opacity
+
+## If alacritty.yml does not exist, raise an alert
+[[ ! -f ~/.config/alacritty/alacritty.yml ]] && \
+    notify-send "alacritty.yml does not exist" && exit 0
+
+## Fetch background_opacity from alacritty.yml
+opacity=$(grep Alacritty ~/.config/picom.conf | grep -o -E "[0-9]+")
+
+## Assign toggle opacity value
+## TODO: add check that value is less than 100
+incremented_opacity=$(($opacity + 5))
+
+## Replace opacity value in alacritty.yml
+sed -i -- "s/\"$opacity:class_g = 'Alacritty'\"/\"$incremented_opacity:class_g = 'Alacritty'\"/" \
+    ~/.config/picom.conf

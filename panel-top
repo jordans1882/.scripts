@@ -1,0 +1,122 @@
+#!/bin/sh
+
+PANEL_FIFO=/tmp/panel-top-fifo
+PANEL_HEIGHT=18
+
+PANEL_FONT_FAMILY="JetBrains Mono Medium"
+ICON_FONT2="IPAGothic"
+ICON_FONT="SauceCodePro Nerd Font Mono"
+
+# setup
+if [ $(pgrep -cx panel-top) -gt 1 ] ; then
+  printf "%s\n" "The panel is already running." >&2 
+  exit 1
+fi
+
+trap 'trap - TERM; kill 0' INT TERM QUIT EXIT
+
+[ -e "$PANEL_FIFO" ] && rm "$PANEL_FIFO"
+mkfifo "$PANEL_FIFO"
+
+bspc subscribe report > "$PANEL_FIFO" &
+# find out how to make this scroll
+xtitle -sf 'X%s\n\n' -t 30 > "$PANEL_FIFO" &
+
+# time and date
+while true;
+do
+    echo "D$(date '+%d.%m.%Y %H:%M:%S')"
+    sleep 1
+done > "$PANEL_FIFO" &
+
+# battery
+while true;
+do
+    for battery in /sys/class/power_supply/BAT?
+    do
+        mode=$(cat "$battery"/status)
+        percent=$(cat "$battery"/capacity)
+        symbol=""
+
+        if [ "$mode" = "Discharging" ]; then
+            symbol=''
+        elif [ "$mode" = "Charging" ]; then
+            symbol=''
+        else
+            symbol=''
+        fi
+
+        echo "B$symbol $percent%"
+    done
+    sleep 10
+done > "$PANEL_FIFO" &
+
+# backlight
+lemonlight > "$PANEL_FIFO" &
+
+# cpu temp
+while true;
+do
+    temp=$(sensors | awk '/^Tdie:/ {print $2}')
+    echo "T $temp"
+    sleep 10
+done > "$PANEL_FIFO" &
+
+# wifi
+while true;
+do
+    for wifi in /sys/class/net/w*
+    do
+        state=$(cat "$wifi"/operstate)
+
+        if [ "$state" = "up" ]; then # if connected
+            echo "N直  "
+        else
+            echo "N睊   "
+        fi
+    done
+    sleep 5
+done > "$PANEL_FIFO" &
+
+# volume
+# initial volume
+lemonvol > "$PANEL_FIFO" &
+# python volume watcher
+lemonvol.py > "$PANEL_FIFO" &
+
+# ram
+while true;
+do
+    mem=$(free -h --mega | awk '/^Mem:/ {print $3 "/" $2}')
+
+    printf  "%s\n" "R $mem"
+    sleep 10
+done > "$PANEL_FIFO"  &
+
+# cpu
+while true;
+do
+    lemoncpu > "$PANEL_FIFO"
+    sleep 5
+done > "$PANEL_FIFO" &
+
+# mpc song status
+lemonsong-status > "$PANEL_FIFO" &
+
+# mpc playing song
+while true
+do
+    song=$(mpc current)
+    printf "%s\n" "M $song" > "$PANEL_FIFO"
+    mpc idle player > /dev/null 2>&1
+done &
+
+. panel_colors
+
+cat "$PANEL_FIFO" | panel_bar-top | lemonbar -g x$PANEL_HEIGHT -o -1 -f "$PANEL_FONT_FAMILY"-8 -f "$ICON_FONT"-9 -f "$ICON_FONT2"-7 -F "$COLOR_FOREGROUND" -B "$COLOR_BACKGROUND" -u  2 | sh &
+
+sleep 1
+xdo above -t $(xdo id -n root) $(xdo id -n lemonbar)
+
+wait
+

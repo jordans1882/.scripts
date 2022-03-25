@@ -1,0 +1,6 @@
+#!/bin/bash
+
+[[ -f ~/.Xmodmap ]] && xmodmap ~/.Xmodmap
+xcape -t 200 -e 'Control_L=Escape'
+xcape -t 200 -e 'Hyper_L=Escape'
+

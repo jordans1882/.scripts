@@ -1,0 +1,9 @@
+#!/usr/bin/bash -i
+[ -d ~/.scripts ] && export PATH="~/.scripts:$PATH"
+source ~/.aliases
+aliases=$(compgen -a)
+selected_alias=$(echo "$aliases" | rofi -dmenu -i)
+printf "\n \n"
+if [ -n "$selected_alias" ]; then
+  screen -dm "urxvt -e bash -ic $selected_alias &"
+fi
